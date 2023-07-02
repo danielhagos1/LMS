@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LMS.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LMS.controllers
 {
+    [Authorize]
     public class CoursesController : Controller
     {
         private readonly LmsDbContext _context;
@@ -45,6 +47,7 @@ namespace LMS.controllers
         }
 
         // GET: Courses/Create
+      
         public IActionResult Create()
         {
             return View();

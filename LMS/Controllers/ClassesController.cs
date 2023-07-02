@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LMS.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LMS.controllers
 {
+    [Authorize]
     public class ClassesController : Controller
     {
         private readonly LmsDbContext _context;
