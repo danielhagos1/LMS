@@ -23,7 +23,9 @@ namespace LMS.controllers
         // GET: Classes
         public async Task<IActionResult> Index()
         {
-            var lmsDbContext = _context.Classes.Include(c => c.Course).Include(c => c.Lecturer);
+            var lmsDbContext = _context.Classes
+                .Include(c => c.Course)
+                .Include(c => c.Lecturer);
             return View(await lmsDbContext.ToListAsync());
         }
 
@@ -50,8 +52,19 @@ namespace LMS.controllers
         // GET: Classes/Create
         public IActionResult Create()
         {
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Id");
-            ViewData["LecturerId"] = new SelectList(_context.Lecturers, "Id", "Id");
+            var courses = _context.Courses.Select( q => new
+            {
+                CourseDetails = $"{q.Code} - {q.Name}({q.Credits})",
+                q.Id
+            }
+            );
+            ViewData["CourseId"] = new SelectList(courses, "Id", "CourseDetails");
+            var lecturers = _context.Lecturers.Select(q => new 
+            {
+                FullName = $"{q.FirstName} {q.LastName}",
+                q.Id
+            });
+            ViewData["LecturerId"] = new SelectList(lecturers, "Id", "FullName");
             return View();
         }
 
@@ -68,8 +81,7 @@ namespace LMS.controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Id", @class.CourseId);
-            ViewData["LecturerId"] = new SelectList(_context.Lecturers, "Id", "Id", @class.LecturerId);
+            CreateSelectLists();
             return View(@class);
         }
 
@@ -86,8 +98,7 @@ namespace LMS.controllers
             {
                 return NotFound();
             }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Id", @class.CourseId);
-            ViewData["LecturerId"] = new SelectList(_context.Lecturers, "Id", "Id", @class.LecturerId);
+            CreateSelectLists();
             return View(@class);
         }
 
@@ -123,8 +134,7 @@ namespace LMS.controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CourseId"] = new SelectList(_context.Courses, "Id", "Id", @class.CourseId);
-            ViewData["LecturerId"] = new SelectList(_context.Lecturers, "Id", "Id", @class.LecturerId);
+            CreateSelectLists();
             return View(@class);
         }
 
@@ -170,6 +180,23 @@ namespace LMS.controllers
         private bool ClassExists(int id)
         {
           return (_context.Classes?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        private void CreateSelectLists()
+        {
+            var courses = _context.Courses.Select(q => new
+            {
+                CourseDetails = $"{q.Code} - {q.Name}{(q.Credits)}",
+                q.Id
+            }
+          );
+            ViewData["CourseId"] = new SelectList(courses, "Id", "CourseDetails");
+            var lecturers = _context.Lecturers.Select(q => new
+            {
+                FullName = $"{q.FirstName} {q.LastName}",
+                q.Id
+            });
+            ViewData["LecturerId"] = new SelectList(lecturers, "Id", "FullName");
         }
     }
 }

@@ -9,8 +9,7 @@ using LMS.Data;
 using Microsoft.AspNetCore.Authorization;
 
 namespace LMS.controllers
-{
-    [Authorize]
+{ 
     public class CoursesController : Controller
     {
         private readonly LmsDbContext _context;
