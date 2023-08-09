@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LMS.Data;
 using Microsoft.AspNetCore.Authorization;
+using LMS.Models;
 
 namespace LMS.controllers
 {
@@ -175,6 +176,64 @@ namespace LMS.controllers
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<ActionResult> ManageEnrollments(int id)
+        {
+            var @class = await _context.Classes
+                .Include(q => q.Course)
+                .Include(q => q.Lecturer)
+                .Include(q => q.Enrollments)
+                   .ThenInclude(q => q.Student)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var students = await _context.Students.ToListAsync();
+
+            var model = new ClassEnrollmentViewModel();
+            model.Class = @class;
+
+            foreach(var student in students)
+            {
+                model.Students.Add(new StudentEnrollmentViewModel
+                {
+                    Id = student.Id,
+                    FirstName = student.FirstName,
+                    LastName = student.LastName,
+                    IsEnrolled = (@class?.Enrollments?.Any(q => q.StudentId == student.Id))
+                                 .GetValueOrDefault()
+                });
+            }
+
+            return View(model);
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> EnrollStudent(int classId, int studentId, bool shouldEnroll)
+        {
+            var enrollment = new Enrollment();
+            if(shouldEnroll)
+            {
+                enrollment.ClassId = classId;
+                enrollment.StudentId = studentId;
+                await _context.AddAsync(enrollment);
+            }
+            else
+            {
+                enrollment = await _context.Enrollments.FirstOrDefaultAsync(
+                    q => q.ClassId == classId && q.StudentId == studentId
+                    );
+
+                if(enrollment != null)
+                {
+                    _context.Remove(enrollment);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+
         }
 
         private bool ClassExists(int id)

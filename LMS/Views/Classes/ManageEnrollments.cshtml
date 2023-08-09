@@ -1,0 +1,45 @@
+@model LMS.Models.ClassEnrollmentViewModel
+
+@{
+    ViewData["Title"] = "Manage Enrollments";
+}
+
+<h2>ManageEnrollments for @Model.Class.Time from Session of
+    @Model.Class.Course.Code - @Model.Class.Course.Name</h2>
+    <h3> Instructor: @Model.Class.Lecturer.FirstName @Model.Class.Lecturer.LastName </h3>
+
+
+<hr />
+
+<h3>Student List</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var student in Model.Enrollments)
+        {
+            <tr>
+                <td>@student.FirstName</td>
+                <td>@student.LastName</td>
+                <td>
+                    @if (student.IsEnrolled)
+                    {
+                        <button data-studentId="@student.Id" data-shouldEnroll="false"
+                        class="btn btn-danger enrollementBtn" type="button">Remove</button>
+                    } else
+                    {
+                        <button data-studentId="@student.Id" data-shouldEnroll="true"
+                        class="btn btn-success enrollemntBtn" type="button">Add</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

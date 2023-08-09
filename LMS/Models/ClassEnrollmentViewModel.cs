@@ -5,7 +5,7 @@ namespace LMS.Models
     public class ClassEnrollmentViewModel
     {
         public Class? Class { get; set; }
-        public List<StudentEnrollmentViewModel> Enrollments { get; set; } = new
+        public List<StudentEnrollmentViewModel> Students { get; set; } = new
             List<StudentEnrollmentViewModel>();
 
     }
